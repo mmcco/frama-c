@@ -1,0 +1,48 @@
+@ignore                                                                        
+@ignore                                                                        
+@ignore  This file is part of Frama-C.                                         
+@ignore                                                                        
+@ignore  Copyright (C) 2007-2015                                               
+@ignore    CEA (Commissariat à l'énergie atomique et aux énergies              
+@ignore         alternatives)                                                  
+@ignore                                                                        
+@ignore  you can redistribute it and/or modify it under the terms of the GNU   
+@ignore  Lesser General Public License as published by the Free Software       
+@ignore  Foundation, version 2.1.                                              
+@ignore                                                                        
+@ignore  It is distributed in the hope that it will be useful,                 
+@ignore  but WITHOUT ANY WARRANTY; without even the implied warranty of        
+@ignore  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         
+@ignore  GNU Lesser General Public License for more details.                   
+@ignore                                                                        
+@ignore  See the GNU Lesser General Public License version 2.1                 
+@ignore  for more details (enclosed in the file licenses/LGPLv2.1).            
+@ignore                                                                        
+@ignore                                                                        
+
+
+{2 Overview}
+
+The Sparecode module aims at removing the unused code.
+
+It is composed of to parts : 
+- one (in module {!module:Marks}) that computes some information
+to say what has to be kept in the result. It uses the generic PDG 
+marking facility {{:../pdg/PdgMarks.html}PdgMarks}+{{:../pdg/Marks.html}Marks},
+- and a second one (module {!module:Transform})
+that read thoses results to produce a new application.
+This part mainly use {{:../html/Filter.html}Filter}
+which provides a functor that filters an application to create another one.
+
+To select the useful statements, we start from the [main] outputs
+and the reachable annotations, and mark backward all the dependencies.
+When reaching a function call, the called function statements are also marked
+according to the needed outputs, but the inputs are not propagated immediately
+because it would make every function call visible.
+The information provided by the PDG marking system is kept to be used later.
+
+So, after the first step, we iterate on the input marks to propagate,
+and propagate them only for the visible calls, ie those which have at least
+one visible output. This process is repeated as long as there are some
+modification.
+
